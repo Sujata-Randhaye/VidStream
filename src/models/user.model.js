@@ -48,10 +48,10 @@ const userSchema=new Schema({
 },{timestamps:true})
 
 //middleware in mongoose
-userSchema.pre("save",async function (next){
+userSchema.pre("save",async function (next){  //save is triggered whenever we create or update any model
     if(!this.isModified("password")) return next()
         
-        this.password=bcrypt.hash(this.password,10)
+        this.password= await bcrypt.hash(this.password,10)
         next()
 })
 

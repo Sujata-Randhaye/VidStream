@@ -1,3 +1,4 @@
+//stores data to local public/temp folder
 import multer from "multer"
 
 const storage = multer.diskStorage({
