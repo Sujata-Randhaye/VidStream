@@ -11,4 +11,5 @@ const subscriptionShcema=new Schema({
     },
 },{timestamps:true})
 
+subscriptionShcema.save()
 export const Subscription= mongoose.model("Subscription",subscriptionShcema);

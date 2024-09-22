@@ -68,8 +68,8 @@ const registerUser=asyncHandler(async (req,res)=>{
 
     //way2
     let coverImageLocalPath;
-    console.log(req.files.avatar)
-    console.log(req.files.coverImage)
+    // console.log(req.files.avatar)
+    // console.log(req.files.coverImage)
 
         if(req.files && Array.isArray(req.files.coverImage) &&
     req.files.coverImage.length>0)
@@ -175,7 +175,9 @@ const logoutUser=asyncHandler(async(req,res)=>{
         {
             //mongodb operator
             $unset: {
-                refreshToken: undefined,
+                // refreshToken: undefined,
+                refreshToken:1  //this removes the
+                // field from document
             }
         },
         {
@@ -290,7 +292,7 @@ const updateAccountDetails=asyncHandler(async(req,res)=>{
         {
             $set:{
                 fullname:fullname,
-                email,
+                email:email,
             }
         },
         {new:true}
@@ -440,22 +442,24 @@ const getWatchHistory = asyncHandler(async(req,res)=>{
         {
             $match:{
                 _id:new mongoose.Types.ObjectId(req.user._id)
+                //as we get string with req.user._id hence to convert it
+                // to mongoDb object id we use this format
             }
         },
         {
-            $lookup:{
+            $lookup:{   //we are in users adding videos to watchHistory
                 from:"videos",
                 localField:"watchHistory",
                 foreignField:"_id",
                 as:"watchHistory",
-                pipeline:[
+                pipeline:[  //here we are in videos adding user details who is owner of video
                     {
                         $lookup:{
                             from:"users",
                             localField:"owner",
                             foreignField:"_id",
                             as:"owner",
-                            pipeline:[
+                            pipeline:[  //To reduce fields in owner field
                                 {
                                     $project:{
                                         fullname:1,
@@ -471,6 +475,13 @@ const getWatchHistory = asyncHandler(async(req,res)=>{
                                     }
                                 }
                             ]
+                        }
+                    },
+                    {
+                        $addFields:{  //adding new field as qwner instead of array in videos model
+                            owner:{
+                                $first: "$owner"
+                            }
                         }
                     }
                 ]
@@ -488,6 +499,7 @@ const getWatchHistory = asyncHandler(async(req,res)=>{
         )
     )
 })
+
 export {
     registerUser,
     loginUser,
